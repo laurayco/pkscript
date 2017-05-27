@@ -10,7 +10,7 @@ import functools
 def __simple_return(*a): return a
 
 def script_func(structure,b):
-	comp = functools.partial(struct.pack,'<B' + structure)
+	comp = functools.partial(struct.pack,structure)
 	def wrap(f):
 		def replace(*a,**k):
 			return comp(b,*f(*a,**k))
@@ -41,3 +41,17 @@ def direct_arguments(structure,b,help_string=""):
 	def x(*a):return a
 	x.__doc__ = help_string
 	return script_func(structure,b)(x)
+
+def install_commands(cls,cmd_list):
+	for cmd in cmd_list:
+		m = direct_arguments(cmd['structure'],cmd['cmd'],help_string=cmd['doc_string'])
+		name = cmd['name']
+		m.__name__ = name
+		setattr(cls,name,m)
+
+class ScriptEngine:
+	def __init__(self):
+		pass
+	@classmethod
+	def install(cls,cmd_list):
+		install_commands(cls,cmd_list)

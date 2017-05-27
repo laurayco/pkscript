@@ -1,16 +1,19 @@
-import scripting
-import binascii
+import frlg
+from scripting import script_section
 
-@scripting.script_func('<BI')
-def select_character(cid):
-	return (0xAF,cid)
+@script_section
+def sample_text_display(text_location):
+	yield frlg.lock()
+	yield frlg.faceplayer()
+	yield frlg.preparemsg(text_location)
+	yield frlg.closeonkeypress()
+	yield frlg.release()
+	yield frlg.end()
 
-@scripting.script_section
-def select_all_characters(character_list):
-	for cid in character_list:
-		yield select_character(cid)
-	if len(character_list) < 1:
-		yield None
-
-print(binascii.hexlify(select_character(20)))
-print(binascii.hexlify(select_all_characters([0xBE,0xEF,0x9A,0xCC])))
+if __name__=="__main__":
+	import sys
+	# I don't actually know of any text locations off the top of my head lol
+	TEXT_LOCATION = 0x08123456
+	if len(sys.argv) > 1:
+		TEXT_LOCATION = int(sys.argv[1])
+	sys.stdout.buffer.write(sample_text_display(TEXT_LOCATION))
